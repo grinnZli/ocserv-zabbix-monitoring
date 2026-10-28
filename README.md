@@ -94,8 +94,13 @@ zabbix_get -s <OCSERV_IP> -k 'ocserv.user.status[<USERNAME>]'
 
 ###  Troubleshooting (Решение проблем)
 
-Ошибка Permission denied для occtl: Пользователь zabbix не входит в группу ocserv или нет правила в sudoers.
-Ошибка Unknown metric: Конфиг агента лежит не в той папке. В Agent 2 это /etc/zabbix/zabbix_agent2.d/.
+**Ошибка** Permission denied для occtl 
+**Решение** : 
+Пользователь zabbix не входит в группу ocserv или нет правила в sudoers.
+
+**Ошибка Unknown metric** 
+**Решение** 
+Конфиг агента лежит не в той папке. В Agent 2 это /etc/zabbix/zabbix_agent2.d/.
 
 ### Примечания
 
