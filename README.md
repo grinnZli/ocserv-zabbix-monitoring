@@ -25,8 +25,21 @@
 
 ##  РЈСЃС‚Р°РЅРѕРІРєР°
 
+<<<<<<< HEAD
 ### 1. РЈСЃС‚Р°РЅРѕРІРєР° Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№
 РќР° СЃРµСЂРІРµСЂРµ СЃ ocserv РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅС‹ `jq` Рё `zabbix-agent2`:
+=======
+### 0. Скачивание репозитория
+Склонируйте репозиторий на сервер с ocserv (или скачайте ZIP-архив и распакуйте его):
+
+```bash
+git clone https://github.com/grinnZli/ocserv-zabbix-monitoring.git
+cd ocserv-zabbix-monitoring
+```
+
+### 1. Установка зависимостей
+На сервере с ocserv должны быть установлены `jq` и `zabbix-agent2`:
+>>>>>>> b081cbb (change bash scripts)
 ```bash
 sudo apt update
 sudo apt install -y jq zabbix-agent2
