@@ -1,0 +1,121 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: 9403ce9554c64c56aeb551e725d1d714
+      template: 'OpenConnect VPN'
+      name: 'OpenConnect VPN (ocserv)'
+      description: 'Мониторинг OpenConnect VPN (ocserv)'
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: db4e9c5c4e664786ade755f016259981
+          name: 'Active Sessions'
+          key: ocserv.active_sessions
+        - uuid: 7601fabfa372427aac7ab2b540b92765
+          name: 'Authentication Failures'
+          key: ocserv.auth_failures
+        - uuid: a7e6b7bdd3d348d8ac850eab9a206904
+          name: 'IPs in Ban List'
+          key: ocserv.ips_banned
+        - uuid: 3a3ae86e7d2d483b88473a84a6cbd04d
+          name: 'Total Sessions'
+          key: ocserv.total_sessions
+        - uuid: 395e95d7856f47d792ae8e2e8e45d39a
+          name: 'Traffic In (Global)'
+          key: ocserv.traffic_in
+          units: B
+        - uuid: eb36265e310e43a6a54fa075907224fb
+          name: 'Traffic Out (Global)'
+          key: ocserv.traffic_out
+          units: B
+        - uuid: 316d291fe8d94d9ca7cb6cef1b36acab
+          name: 'Uptime (seconds)'
+          key: ocserv.uptime_seconds
+          triggers:
+            - uuid: a2a6bc8dd3114a15b1c6d9b0f216cdc7
+              expression: 'change(/OpenConnect VPN/ocserv.uptime_seconds)<=0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'change(/OpenConnect VPN/ocserv.uptime_seconds)>0'
+              name: 'Service OpenConnect VPN is not responding'
+              priority: WARNING
+              manual_close: 'YES'
+        - uuid: e70dc76e3d73416f8786202365cdacc4
+          name: 'Up Since'
+          key: ocserv.uptime_start
+          delay: 5m
+          value_type: CHAR
+          trends: '0'
+      discovery_rules:
+        - uuid: a1a65fb7ef1340b1ab3b8c96fb34df35
+          name: 'VPN Banned IPs Discovery'
+          key: ocserv.ban.discovery
+          item_prototypes:
+            - uuid: 3eb9c54932ec4dd7a4c5d6009fbc3dfd
+              name: 'BANNED IP {#BANNED_IP}'
+              key: 'ocserv.ban.status[{#BANNED_IP}]'
+              trigger_prototypes:
+                - uuid: 9ca0aab32f814804b38a3ba722c6a6ba
+                  expression: 'last(/OpenConnect VPN/ocserv.ban.status[{#BANNED_IP}])=1'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/OpenConnect VPN/ocserv.ban.status[{#BANNED_IP}])=0'
+                  name: 'IP Banned: {#BANNED_IP}'
+                  priority: HIGH
+        - uuid: 0aae934888a54eedb8f0a0426e9814c3
+          name: 'VPN Users Discovery'
+          key: ocserv.user.discovery
+          delay: 10m
+          lifetime: 30d
+          item_prototypes:
+            - uuid: b98d3845dd8a4542aff59763955521f2
+              name: 'User {#USERNAME}: Connected At'
+              key: 'ocserv.user.connected_at[{#USERNAME}]'
+              delay: 5m
+              value_type: CHAR
+              trends: '0'
+            - uuid: f4b32851ffb546e49e19aef230f6f61d
+              name: 'User {#USERNAME}: Hostname'
+              key: 'ocserv.user.hostname[{#USERNAME}]'
+              delay: 5m
+              value_type: CHAR
+              trends: '0'
+            - uuid: 4b9c0b2793eb4b4398336846758b1561
+              name: 'User {#USERNAME}: Remote IP'
+              key: 'ocserv.user.remote_ip[{#USERNAME}]'
+              delay: 5m
+              value_type: CHAR
+              trends: '0'
+            - uuid: d1b7c07580904caf9ad0976c26254a6c
+              name: 'User {#USERNAME}: Status'
+              key: 'ocserv.user.status[{#USERNAME}]'
+              valuemap:
+                name: 'OpenConnect Status'
+              trigger_prototypes:
+                - uuid: 9e1f38dac85b4ab5977e53f145c12093
+                  expression: 'last(/OpenConnect VPN/ocserv.user.status[{#USERNAME}])=1'
+                  name: 'VPN User {#USERNAME}: Connected'
+                  priority: INFO
+            - uuid: 6cbcfb22e11d4da8a183c343388e57b6
+              name: 'User {#USERNAME}: Traffic In'
+              key: 'ocserv.user.traffic_in[{#USERNAME}]'
+              units: B
+            - uuid: 646a751b7efc4124a1fb9427078cc2d6
+              name: 'User {#USERNAME}: Traffic Out'
+              key: 'ocserv.user.traffic_out[{#USERNAME}]'
+              units: B
+            - uuid: a006160202354b27b3a9f3c7301c8db4
+              name: 'User {#USERNAME}: Device'
+              key: 'ocserv.user.user_agent[{#USERNAME}]'
+              delay: 5m
+              value_type: CHAR
+              trends: '0'
+      valuemaps:
+        - uuid: 449ba1cd2cb341d9bff78c618a7574f0
+          name: 'OpenConnect Status'
+          mappings:
+            - value: '1'
+              newvalue: Online
+            - value: '0'
+              newvalue: Offline
