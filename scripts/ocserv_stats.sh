@@ -1,16 +1,14 @@
-### 2. `scripts/ocserv_stats.sh`
-
 #!/bin/bash
 # ==========================================
 # ocserv_stats.sh
-# Скрипт для сбора метрик OpenConnect VPN (ocserv) для Zabbix Agent 2
+# Script for collecting OpenConnect VPN (ocserv) metrics for Zabbix Agent 2
 # ==========================================
 
 STATUS_JSON=$(sudo /usr/bin/occtl --json show status 2>/dev/null)
 USERS_JSON=$(sudo /usr/bin/occtl --json show users 2>/dev/null)
 PASSWD_FILE="/etc/ocserv/ocpasswd"
 
-# Проверка доступности ocserv
+# Check if ocserv is available
 if [ -z "$STATUS_JSON" ]; then
     echo "0"
     exit 1
@@ -18,7 +16,7 @@ fi
 
 case "$1" in
     # ==========================================
-    # --- Общие метрики сервера ---
+    # --- General server metrics ---
     # ==========================================
     active_sessions) echo "$STATUS_JSON" | jq -r '.["Active sessions"] // 0' ;;
     total_sessions) echo "$STATUS_JSON" | jq -r '.["Total sessions"] // 0' ;;
@@ -30,7 +28,7 @@ case "$1" in
     traffic_out) echo "$STATUS_JSON" | jq -r '.raw_tx // 0' ;;
 
     # ==========================================
-    # --- LLD для пользователей (из ocpasswd) ---
+    # --- LLD for users (from ocpasswd) ---
     # ==========================================
     user_list)
         if [ -f "$PASSWD_FILE" ]; then
@@ -44,7 +42,7 @@ case "$1" in
         fi
         ;;
     
-    # --- Метрики конкретного пользователя ---
+    # --- Specific user metrics ---
     user_status)
         USERNAME="$2"
         IS_ONLINE=$(echo "$USERS_JSON" | jq -r --arg u "$USERNAME" '.[] | select(.Username == $u) | .Username' 2>/dev/null)
@@ -52,7 +50,6 @@ case "$1" in
         ;;
     user_traffic_in)
         USERNAME="$2"
-        # Если jq ничего не находит, возвращаем 0
         RES=$(echo "$USERS_JSON" | jq -r --arg u "$USERNAME" '.[] | select(.Username == $u) | .RX' 2>/dev/null)
         if [ -z "$RES" ]; then echo "0"; else echo "$RES"; fi
         ;;
@@ -79,7 +76,7 @@ case "$1" in
         ;;
 
     # ==========================================
-    # --- LLD и статус для забаненных IP ---
+    # --- LLD and status for banned IPs ---
     # ==========================================
     ban_list)
         BANS_JSON=$(sudo /usr/bin/occtl -j show ip bans 2>/dev/null)
@@ -101,7 +98,7 @@ case "$1" in
         ;;
 
     # ==========================================
-    # --- Обработка неизвестных команд ---
+    # --- Unknown commands fallback ---
     # ==========================================
     *)
         echo "0"
